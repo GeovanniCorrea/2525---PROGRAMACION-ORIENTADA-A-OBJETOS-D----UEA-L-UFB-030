@@ -1,46 +1,62 @@
 import os
+import subprocess
 
+"""
+Archivo: dashboard.py
+Descripción: Script que permite visualizar y ejecutar el contenido de diferentes scripts organizados por unidades temáticas.
+El usuario puede seleccionar una opción del menú para ver el código fuente de un archivo específico o ejecutarlo.
+
+Cambios realizados:
+- Se organizó el menú por unidades temáticas.
+- Se agregaron rutas relativas a los archivos.
+- Se implementaron funciones con manejo de errores.
+- Se mejoró la interfaz del menú con nombres descriptivos.
+- Se documentó el código con comentarios explicativos.
+"""
 
 def mostrar_codigo(ruta_script):
-    # Asegúrate de que la ruta al script es absoluta
+    """
+    Abre y muestra el contenido del archivo Python especificado.
+    Parámetros:
+    ruta_script (str): Ruta absoluta del archivo a mostrar.
+    """
     ruta_script_absoluta = os.path.abspath(ruta_script)
     try:
-        with open(ruta_script_absoluta, 'r') as archivo:
+        with open(ruta_script_absoluta, 'r', encoding='utf-8') as archivo:
             print(f"\n--- Código de {ruta_script} ---\n")
             print(archivo.read())
     except FileNotFoundError:
-        print("El archivo no se encontró.")
+        print("❌ El archivo no se encontró.")
     except Exception as e:
-        print(f"Ocurrió un error al leer el archivo: {e}")
+        print(f"❌ Ocurrió un error al leer el archivo: {e}")
 
+def ejecutar_script(ruta_script):
+    """
+    Ejecuta el script Python especificado.
+    Parámetros:
+    ruta_script (str): Ruta absoluta del archivo a ejecutar.
+    """
+    ruta_script_absoluta = os.path.abspath(ruta_script)
+    try:
+        print(f"\n▶️ Ejecutando {ruta_script}...\n")
+        subprocess.run(['python', ruta_script_absoluta], check=True)
+    except subprocess.CalledProcessError as e:
+        print(f"❌ Error al ejecutar el script: {e}")
+    except FileNotFoundError:
+        print("❌ El archivo no se encontró.")
+    except Exception as e:
+        print(f"❌ Ocurrió un error al ejecutar el archivo: {e}")
+
+def buscar_scripts(palabra_clave, opciones):
+    """
+    Busca scripts que contengan una palabra clave en su nombre o descripción.
+    Parámetros:
+    palabra_clave (str): Palabra clave para buscar.
+    opciones (dict): Diccionario con las rutas relativas de los scripts.
+    """
+    resultados = {key: value for key, value in opciones.items() if palabra_clave.lower() in value.lower()}
+    return resultados
 
 def mostrar_menu():
-    # Define la ruta base donde se encuentra el dashboard.py
-    ruta_base = os.path.dirname(__file__)
-
-    opciones = {
-        '1': 'UNIDAD 1/1.2. Tecnicas de Programacion/1.2.1. Ejemplo Tecnicas de Programacion.py'
-        # Agrega aquí el resto de las rutas de los scripts
-    }
-
-    while True:
-        print("\nMenu Principal - Dashboard")
-        # Imprime las opciones del menú
-        for key in opciones:
-            print(f"{key} - {opciones[key]}")
-        print("0 - Salir")
-
-        eleccion = input("Elige un script para ver su código o '0' para salir: ")
-        if eleccion == '0':
-            break
-        elif eleccion in opciones:
-            # Asegura que el path sea absoluto
-            ruta_script = os.path.join(ruta_base, opciones[eleccion])
-            mostrar_codigo(ruta_script)
-        else:
-            print("Opción no válida. Por favor, intenta de nuevo.")
-
-
-# Ejecutar el dashboard
-if __name__ == "__main__":
-    mostrar_menu()
+    """
+    Muestra el menú de opciones y permite al usuario elegir un archivo para ver su
