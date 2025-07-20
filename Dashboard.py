@@ -1,25 +1,14 @@
 import os
-import subprocess
+import subprocess  # ya está, pero asegúrate de que ambos estén al inicio
 
 """
 Archivo: dashboard.py
 Descripción: Script que permite visualizar y ejecutar el contenido de diferentes scripts organizados por unidades temáticas.
 El usuario puede seleccionar una opción del menú para ver el código fuente de un archivo específico o ejecutarlo.
-
-Cambios realizados:
-- Se organizó el menú por unidades temáticas.
-- Se agregaron rutas relativas a los archivos.
-- Se implementaron funciones con manejo de errores.
-- Se mejoró la interfaz del menú con nombres descriptivos.
-- Se documentó el código con comentarios explicativos.
+...
 """
 
 def mostrar_codigo(ruta_script):
-    """
-    Abre y muestra el contenido del archivo Python especificado.
-    Parámetros:
-    ruta_script (str): Ruta absoluta del archivo a mostrar.
-    """
     ruta_script_absoluta = os.path.abspath(ruta_script)
     try:
         with open(ruta_script_absoluta, 'r', encoding='utf-8') as archivo:
@@ -31,11 +20,6 @@ def mostrar_codigo(ruta_script):
         print(f"❌ Ocurrió un error al leer el archivo: {e}")
 
 def ejecutar_script(ruta_script):
-    """
-    Ejecuta el script Python especificado.
-    Parámetros:
-    ruta_script (str): Ruta absoluta del archivo a ejecutar.
-    """
     ruta_script_absoluta = os.path.abspath(ruta_script)
     try:
         print(f"\n▶️ Ejecutando {ruta_script}...\n")
@@ -48,15 +32,62 @@ def ejecutar_script(ruta_script):
         print(f"❌ Ocurrió un error al ejecutar el archivo: {e}")
 
 def buscar_scripts(palabra_clave, opciones):
-    """
-    Busca scripts que contengan una palabra clave en su nombre o descripción.
-    Parámetros:
-    palabra_clave (str): Palabra clave para buscar.
-    opciones (dict): Diccionario con las rutas relativas de los scripts.
-    """
-    resultados = {key: value for key, value in opciones.items() if palabra_clave.lower() in value.lower()}
-    return resultados
+    return {k: v for k, v in opciones.items() if palabra_clave.lower() in v.lower()}
 
 def mostrar_menu():
-    """
-    Muestra el menú de opciones y permite al usuario elegir un archivo para ver su
+    ruta_base = os.path.dirname(__file__)
+
+    opciones = {
+        '1': 'UNIDAD 1/1.2. Tecnicas de Programacion/1.2.1. Ejemplo Tecnicas de Programacion.py',
+        '2': 'UNIDAD 1/1.3. Algoritmos/1.3.1. Introduccion a Algoritmos.py',
+        '3': 'UNIDAD 1/1.4. Variables/1.4.1. Tipos de Datos.py',
+        '4': 'UNIDAD 2/1.1. Tipos de Datos e Identificadores/Semana 05.py',
+        '5': 'UNIDAD 2/1.2. Clases, Objetos, Herencia, Encapsulamiento y Polimorfismo/Semana 06.py',
+        '6': 'UNIDAD 2/2.1. Constructores y Destructores.py',
+    }
+
+    nombres_opciones = {
+        '1': 'Ejemplo Técnicas de Programación',
+        '2': 'Introducción a Algoritmos',
+        '3': 'Tipos de Datos',
+        '4': 'Tipos de Datos e Identificadores',
+        '5': 'Clases, Objetos, Herencia, Encapsulamiento y Polimorfismo',
+        '6': 'Constructores y Destructores'
+    }
+
+    while True:
+        print("\n📘 Menu Principal - Dashboard")
+        for unidad, keys in [('UNIDAD 1', ['1', '2', '3']), ('UNIDAD 2', ['4', '5', '6'])]:
+            print(f"\n{unidad}:")
+            for key in keys:
+                print(f"{key} - {nombres_opciones[key]}")
+        print("\n7 - Buscar script por palabra clave")
+        print("0 - Salir")
+
+        elec = input("\nElige una opción: ")
+        if elec == '0':
+            print("👋 Saliendo... ¡Hasta luego!")
+            break
+        elif elec == '7':
+            clave = input("🔍 Palabra clave: ")
+            res = buscar_scripts(clave, opciones)
+            if res:
+                print("🔍 Resultados:")
+                for k, v in res.items():
+                    print(f"{k} - {nombres_opciones.get(k, 'Sin nombre')} ({v})")
+            else:
+                print("⚠️ No se encontraron scripts.")
+        elif elec in opciones:
+            ruta = os.path.join(ruta_base, opciones[elec])
+            accion = input("¿Ver código (v) o Ejecutar (e)? ").lower()
+            if accion == 'v':
+                mostrar_codigo(ruta)
+            elif accion == 'e':
+                ejecutar_script(ruta)
+            else:
+                print("⚠️ Opción no válida.")
+        else:
+            print("⚠️ Opción no válida.")
+
+if __name__ == "__main__":
+    mostrar_menu()
